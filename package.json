@@ -1,0 +1,27 @@
+{
+  "name": "task-manager",
+  "version": "1.0.0",
+  "description": "A task manager application involving CRUD operations in node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rjg007/task-manager.git"
+  },
+  "keywords": [
+    "node.js;",
+    "task-manager;",
+    "CRUD"
+  ],
+  "author": "Rahul Ghorpade",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rjg007/task-manager/issues"
+  },
+  "homepage": "https://github.com/rjg007/task-manager#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
