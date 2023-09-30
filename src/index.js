@@ -33,11 +33,15 @@ app.get("/", (req, res) => {
 app.get("/tasks", (req, res) => {
   const sortBy = req.query.sortBy;
   let sortedItems = [...tasksData.allTasks];
+  const filterBy = req.query.filterBy;
+  let filteredItems = sortedItems;
 
-  const finalResult = sortFunction(sortBy, sortedItems);
+  if (filterBy) {
+    let flagToCheck = filterBy === "true";
+    filteredItems = filteredItems.filter((task) => task.flag === flagToCheck);
+  }
 
-  console.log("hhhellllo", finalResult);
-  ``;
+  const finalResult = sortFunction(sortBy, filteredItems);
   res.status(200).json({ allTasks: finalResult });
 });
 
