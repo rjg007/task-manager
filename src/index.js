@@ -38,7 +38,6 @@ app.get("/tasks", (req, res) => {
     if (err) {
       return res.status(500).send("Error reading tasks file");
     } else {
-      // let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
       let tasks = JSON.parse(data);
       let sortedItems = [...tasks];
       const filterBy = req.query.filterBy;
@@ -62,12 +61,22 @@ app.get("/tasks", (req, res) => {
 
 app.get("/tasks/:taskId", (req, res) => {
   const { taskId } = req.params;
-  let task = tasksData.filter((item) => item.id == taskId);
-  if (task.length == 0) {
-    return res.status(404).send("No appropriate task found for this task id");
-  } else {
-    return res.status(200).json(task);
-  }
+  const filePath = path.join(__dirname, "..", "tasks.json");
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading tasks file");
+    } else {
+      let tasks = JSON.parse(data);
+      let task = tasks.filter((item) => item.id == taskId);
+      if (task.length == 0) {
+        return res
+          .status(404)
+          .send("No appropriate task found for this task id");
+      } else {
+        return res.status(200).json(task);
+      }
+    }
+  });
 });
 
 app.post("/tasks", (req, res) => {
@@ -83,7 +92,6 @@ app.post("/tasks", (req, res) => {
       if (err) {
         return res.status(500).send("Error reading tasks file");
       } else {
-        // let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
         let tasksModifiedData = JSON.parse(data);
         let itemToAdd = {
           id: uuidv4(),
@@ -122,34 +130,41 @@ app.put("/tasks/:id", (req, res) => {
     const errorMessage = error.details.map((d) => d.message).join(", ");
     return res.status(400).send(errorMessage);
   } else {
-    let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
+    fs.readFile(writePath, "utf8", (err, data) => {
+      if (err) {
+        return res.status(500).send("Error reading tasks file");
+      } else {
+        let tasksModifiedData = JSON.parse(data);
 
-    // Find the index of the task with the given ID
-    const taskIndex = tasksModifiedData.findIndex((task) => task.id === taskId);
+        // Find the index of the task with the given ID
+        const taskIndex = tasksModifiedData.findIndex(
+          (task) => task.id === taskId
+        );
 
-    if (taskIndex === -1) {
-      return res.status(404).send("Task not found");
-    } else {
-      tasksModifiedData[taskIndex] = {
-        id: taskId,
-        ...value,
-      };
-
-      fs.writeFile(
-        writePath,
-        JSON.stringify(tasksModifiedData),
-        { encoding: "utf8", flag: "w" },
-        (err, data) => {
-          if (err) {
-            return res
-              .status(500)
-              .send("Something went wrong while updating the task");
-          } else {
-            return res.status(200).send("Task updated successfully");
-          }
+        if (taskIndex === -1) {
+          return res.status(404).send("Task not found");
+        } else {
+          tasksModifiedData[taskIndex] = {
+            id: taskId,
+            ...value,
+          };
+          fs.writeFile(
+            writePath,
+            JSON.stringify(tasksModifiedData),
+            { encoding: "utf8", flag: "w" },
+            (err, data) => {
+              if (err) {
+                return res
+                  .status(500)
+                  .send("Something went wrong while updating the task");
+              } else {
+                return res.status(200).send("Task updated successfully");
+              }
+            }
+          );
         }
-      );
-    }
+      }
+    });
   }
 });
 
@@ -194,12 +209,22 @@ app.delete("/tasks/:taskId", (req, res) => {
 
 app.get("/tasks/priority/:level", (req, res) => {
   const { level } = req.params;
-  let tasks = tasksData.filter((item) => item.priority == level);
-  if (tasks.length == 0) {
-    return res.status(404).send("No appropriate task found for this task id");
-  } else {
-    return res.status(200).json(tasks);
-  }
+  const filePath = path.join(__dirname, "..", "tasks.json");
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading tasks file");
+    } else {
+      let tasks = JSON.parse(data);
+      let filteredTasks = tasks.filter((item) => item.priority == level);
+      if (filteredTasks.length == 0) {
+        return res
+          .status(404)
+          .send("No appropriate task found for this task id");
+      } else {
+        return res.status(200).json(filteredTasks);
+      }
+    }
+  });
 });
 
 app.listen(PORT, (error) => {
