@@ -143,37 +143,41 @@ app.put("/tasks/:id", (req, res) => {
 app.delete("/tasks/:taskId", (req, res) => {
   const taskId = req.params.taskId;
   let writePath = path.join(__dirname, "..", "tasks.json");
-  let tasks = [...tasksData.allTasks];
+  // let tasks = [...tasksData.allTasks];
 
   // Find the task to be deleted.
-  const taskIndex = tasks.findIndex((task) => task.id == taskId);
-  console.log(taskIndex);
 
-  if (taskIndex === -1) {
-    return res.status(404).send("Task not found");
-  } else {
-    let tasksModifiedData = JSON.parse(JSON.stringify(tasks));
+  fs.readFile(writePath, "utf-8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading tasks file");
+    } else {
+      let tasks = JSON.parse(data);
+      const taskIndex = tasks.findIndex((task) => task.id == taskId);
+      // Remove the task from the array
+      tasks.splice(taskIndex, 1);
+      if (taskIndex === -1) {
+        return res.status(404).send("Task not found");
+      } else {
+        let tasksModifiedData = JSON.parse(JSON.stringify(tasks));
 
-    // Remove the task from the array
-    tasksModifiedData.splice(taskIndex, 1);
-    tasksModifiedData;
-
-    // Write the modified data back to the file
-    fs.writeFile(
-      writePath,
-      JSON.stringify(tasksModifiedData),
-      { encoding: "utf8", flag: "w" },
-      (err, data) => {
-        if (err) {
-          return res
-            .status(500)
-            .send("Something went wrong while deleting the task");
-        } else {
-          return res.status(200).send("Task deleted successfully");
-        }
+        // Write the modified data back to the file
+        fs.writeFile(
+          writePath,
+          JSON.stringify(tasksModifiedData),
+          { encoding: "utf8", flag: "w" },
+          (err, data) => {
+            if (err) {
+              return res
+                .status(500)
+                .send("Something went wrong while deleting the task");
+            } else {
+              return res.status(200).send("Task deleted successfully");
+            }
+          }
+        );
       }
-    );
-  }
+    }
+  });
 });
 
 app.listen(PORT, (error) => {
