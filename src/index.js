@@ -12,9 +12,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const addTaskSchema = Joi.object({
-  title: Joi.string().min(3).required(),
-  description: Joi.string().min(5).required(),
-  flag: Joi.boolean().required(),
+  title: Joi.string().min(3).required().messages({
+    "any.required": "Title is required",
+    "string.empty": "Title cannot be empty",
+  }),
+  description: Joi.string().min(5).required().messages({
+    "any.required": "Description is required",
+    "string.empty": "Description cannot be empty",
+  }),
+  flag: Joi.boolean().required().messages({
+    "any.required": "Flag is required",
+  }),
 });
 
 app.get("/", (req, res) => {
@@ -41,14 +49,14 @@ app.post("/tasks", (req, res) => {
   const { error, value } = addTaskSchema?.validate(newTaskDetails);
   if (error) {
     console.log(error);
-    return res
-      .status(400)
-      .send("Task field info is invalid, please provide the correct info");
+    const errorMessage = error.details.map((d) => d.message).join(", ");
+    return res.status(400).send(errorMessage);
   } else {
     let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
     console.log("heelo", tasksModifiedData);
     let itemToAdd = {
       id: uuidv4(),
+      createdDate: new Date(),
       ...value,
     };
     tasksModifiedData.allTasks.push(itemToAdd);
@@ -78,9 +86,8 @@ app.put("/tasks/:id", (req, res) => {
 
   if (error) {
     console.log(error);
-    return res
-      .status(400)
-      .send("Task field info is invalid, please provide the correct info");
+    const errorMessage = error.details.map((d) => d.message).join(", ");
+    return res.status(400).send(errorMessage);
   } else {
     let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
 
