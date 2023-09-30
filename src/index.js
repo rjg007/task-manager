@@ -5,6 +5,7 @@ const fs = require("fs");
 // const { addTaskSchema } = require("./helpers/utility");
 const Joi = require("joi");
 const path = require("path");
+const { sortFunction } = require("./helpers/utility");
 const PORT = 1972;
 
 const app = express();
@@ -30,7 +31,14 @@ app.get("/", (req, res) => {
 });
 
 app.get("/tasks", (req, res) => {
-  res.status(200).json(tasksData);
+  const sortBy = req.query.sortBy;
+  let sortedItems = [...tasksData.allTasks];
+
+  const finalResult = sortFunction(sortBy, sortedItems);
+
+  console.log("hhhellllo", finalResult);
+  ``;
+  res.status(200).json({ allTasks: finalResult });
 });
 
 app.get("/tasks/:taskId", (req, res) => {
@@ -125,18 +133,19 @@ app.put("/tasks/:id", (req, res) => {
 app.delete("/tasks/:taskId", (req, res) => {
   const taskId = req.params.taskId;
   let writePath = path.join(__dirname, "..", "tasks.json");
+  let tasks = [...tasksData.allTasks];
 
   // Get the tasks data from the JSON file.
   // const tasksData = JSON.parse(fs.readFileSync(writePath, "utf8"));
 
   // Find the task to be deleted.
-  const taskIndex = tasksData.allTasks.findIndex((task) => task.id == taskId);
+  const taskIndex = tasks.findIndex((task) => task.id == taskId);
   console.log(taskIndex);
 
   if (taskIndex === -1) {
     return res.status(404).send("Task not found");
   } else {
-    let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
+    let tasksModifiedData = JSON.parse(JSON.stringify(tasks));
 
     // Remove the task from the array
     tasksModifiedData.allTasks.splice(taskIndex, 1);

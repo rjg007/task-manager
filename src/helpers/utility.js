@@ -6,4 +6,15 @@ const addTaskSchema = Joi.object({
   flag: Joi.boolean().required(),
 });
 
-module.exports = addTaskSchema;
+const sortFunction = (sortBy, tasksData) => {
+  if (sortBy === "createdBy") {
+    return tasksData.sort((task1, task2) => {
+      // Assuming each task object has a "createdBy" property
+      return task1.createdDate.localeCompare(task2.createdDate);
+    });
+  } else {
+    return tasksData;
+  }
+};
+
+module.exports = { addTaskSchema, sortFunction };
