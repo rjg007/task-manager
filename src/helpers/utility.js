@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const fs = require("fs");
 
 const addTaskSchema = Joi.object({
   title: Joi.string().min(3).required(),
@@ -17,4 +18,14 @@ const sortFunction = (sortBy, tasksData) => {
   }
 };
 
-module.exports = { addTaskSchema, sortFunction };
+const readFileFunction = (writePath) => {
+  fs.readFile(writePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading tasks file");
+    } else {
+      return data;
+    }
+  });
+};
+
+module.exports = { addTaskSchema, sortFunction, readFileFunction };

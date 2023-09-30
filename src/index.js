@@ -5,7 +5,7 @@ const fs = require("fs");
 // const { addTaskSchema } = require("./helpers/utility");
 const Joi = require("joi");
 const path = require("path");
-const { sortFunction } = require("./helpers/utility");
+const { sortFunction, readFileFunction } = require("./helpers/utility");
 const PORT = 3000;
 
 const app = express();
@@ -33,17 +33,31 @@ app.get("/", (req, res) => {
 
 app.get("/tasks", (req, res) => {
   const sortBy = req.query.sortBy;
-  let sortedItems = [...tasksData];
-  const filterBy = req.query.filterBy;
-  let filteredItems = sortedItems;
+  const filePath = path.join(__dirname, "..", "tasks.json");
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      return res.status(500).send("Error reading tasks file");
+    } else {
+      // let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
+      let tasks = JSON.parse(data);
+      let sortedItems = [...tasks];
+      const filterBy = req.query.filterBy;
+      let filteredItems = sortedItems;
 
-  if (filterBy) {
-    let flagToCheck = filterBy === "true";
-    filteredItems = filteredItems.filter((task) => task.flag === flagToCheck);
-  }
-
-  const finalResult = sortFunction(sortBy, filteredItems);
-  res.status(200).json(finalResult);
+      if (filterBy) {
+        let flagToCheck = filterBy === "true";
+        filteredItems = filteredItems.filter(
+          (task) => task.flag === flagToCheck
+        );
+      }
+      const finalResult = sortFunction(sortBy, filteredItems);
+      if (finalResult.length > 0) {
+        res.status(200).json(finalResult);
+      } else {
+        res.status(200).send("No tasks found");
+      }
+    }
+  });
 });
 
 app.get("/tasks/:taskId", (req, res) => {
