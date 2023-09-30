@@ -6,7 +6,7 @@ const fs = require("fs");
 const Joi = require("joi");
 const path = require("path");
 const { sortFunction } = require("./helpers/utility");
-const PORT = 1972;
+const PORT = 3000;
 
 const app = express();
 app.use(express.json());
@@ -177,6 +177,6 @@ app.listen(PORT, (error) => {
   if (error) {
     console.log("Something went wrong while starting the server");
   } else {
-    console.log("Server is running on port 1972");
+    console.log("Server is running on port 3000");
   }
 });
