@@ -24,6 +24,7 @@ const addTaskSchema = Joi.object({
   flag: Joi.boolean().required().messages({
     "any.required": "Flag is required",
   }),
+  priority: Joi.string(),
 });
 
 app.get("/", (req, res) => {
@@ -32,7 +33,7 @@ app.get("/", (req, res) => {
 
 app.get("/tasks", (req, res) => {
   const sortBy = req.query.sortBy;
-  let sortedItems = [...tasksData.allTasks];
+  let sortedItems = [...tasksData];
   const filterBy = req.query.filterBy;
   let filteredItems = sortedItems;
 
@@ -42,12 +43,12 @@ app.get("/tasks", (req, res) => {
   }
 
   const finalResult = sortFunction(sortBy, filteredItems);
-  res.status(200).json({ allTasks: finalResult });
+  res.status(200).json(finalResult);
 });
 
 app.get("/tasks/:taskId", (req, res) => {
   const { taskId } = req.params;
-  let task = tasksData.allTasks.filter((item) => item.id == taskId);
+  let task = tasksData.filter((item) => item.id == taskId);
   if (task.length == 0) {
     return res.status(404).send("No appropriate task found for this task id");
   } else {
@@ -75,8 +76,8 @@ app.post("/tasks", (req, res) => {
           createdDate: new Date(),
           ...value,
         };
-        tasksModifiedData.allTasks.push(itemToAdd);
-        console.log("mod", tasksModifiedData.allTasks);
+        console.log("mod", tasksModifiedData);
+        tasksModifiedData.push(itemToAdd);
         fs.writeFile(
           writePath,
           JSON.stringify(tasksModifiedData),
@@ -110,14 +111,12 @@ app.put("/tasks/:id", (req, res) => {
     let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
 
     // Find the index of the task with the given ID
-    const taskIndex = tasksModifiedData.allTasks.findIndex(
-      (task) => task.id === taskId
-    );
+    const taskIndex = tasksModifiedData.findIndex((task) => task.id === taskId);
 
     if (taskIndex === -1) {
       return res.status(404).send("Task not found");
     } else {
-      tasksModifiedData.allTasks[taskIndex] = {
+      tasksModifiedData[taskIndex] = {
         id: taskId,
         ...value,
       };
@@ -143,7 +142,6 @@ app.put("/tasks/:id", (req, res) => {
 app.delete("/tasks/:taskId", (req, res) => {
   const taskId = req.params.taskId;
   let writePath = path.join(__dirname, "..", "tasks.json");
-  // let tasks = [...tasksData.allTasks];
 
   // Find the task to be deleted.
 
@@ -178,6 +176,16 @@ app.delete("/tasks/:taskId", (req, res) => {
       }
     }
   });
+});
+
+app.get("/tasks/priority/:level", (req, res) => {
+  const { level } = req.params;
+  let tasks = tasksData.filter((item) => item.priority == level);
+  if (tasks.length == 0) {
+    return res.status(404).send("No appropriate task found for this task id");
+  } else {
+    return res.status(200).json(tasks);
+  }
 });
 
 app.listen(PORT, (error) => {

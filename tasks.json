@@ -1,18 +1,17 @@
-{
-  "allTasks": [
-    {
-      "id": "29f1b4e3-745c-4ad3-afb6-ab45ff1e14ed",
-      "createdDate": "2023-09-30T10:16:11.949Z",
-      "title": "Randomsdd Task",
-      "description": "new task",
-      "flag": true
-    },
-    {
-      "id": "f94497b1-cc9e-4521-ad32-5a3c22781a39",
-      "createdDate": "2023-09-30T10:06:56.458Z",
-      "title": "Randomsddsdfdsf Task",
-      "description": "new task asdfsdf",
-      "flag": true
-    }
-  ]
-}
+[
+  {
+    "id": "50d6ea89-2e74-45f0-aa64-353fb86f0c2a",
+    "createdDate": "2023-09-30T13:07:45.514Z",
+    "title": "Watch PL",
+    "description": "Watch the united game",
+    "flag": true,
+    "priority": "low"
+  },
+  {
+    "id": "7c495b1e-ce39-4833-ba7a-a6b215c33616",
+    "title": "Watch DSA recording",
+    "description": "Catch up on DSA",
+    "flag": true,
+    "priority": "medium"
+  }
+]
