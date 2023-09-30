@@ -64,29 +64,35 @@ app.post("/tasks", (req, res) => {
     const errorMessage = error.details.map((d) => d.message).join(", ");
     return res.status(400).send(errorMessage);
   } else {
-    let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
-    console.log("heelo", tasksModifiedData);
-    let itemToAdd = {
-      id: uuidv4(),
-      createdDate: new Date(),
-      ...value,
-    };
-    tasksModifiedData.allTasks.push(itemToAdd);
-    console.log("mod", tasksModifiedData.allTasks);
-    fs.writeFile(
-      writePath,
-      JSON.stringify(tasksModifiedData),
-      { encoding: "utf8", flag: "w" },
-      (err, data) => {
-        if (err) {
-          return res
-            .status(500)
-            .send("Something went wront while creating the task");
-        } else {
-          return res.status(200).send("Task created successfully");
-        }
+    fs.readFile(writePath, "utf8", (err, data) => {
+      if (err) {
+        return res.status(500).send("Error reading tasks file");
+      } else {
+        // let tasksModifiedData = JSON.parse(JSON.stringify(tasksData));
+        let tasksModifiedData = JSON.parse(data);
+        let itemToAdd = {
+          id: uuidv4(),
+          createdDate: new Date(),
+          ...value,
+        };
+        tasksModifiedData.allTasks.push(itemToAdd);
+        console.log("mod", tasksModifiedData.allTasks);
+        fs.writeFile(
+          writePath,
+          JSON.stringify(tasksModifiedData),
+          { encoding: "utf8", flag: "w" },
+          (err, data) => {
+            if (err) {
+              return res
+                .status(500)
+                .send("Something went wront while creating the task");
+            } else {
+              return res.status(200).send("Task created successfully");
+            }
+          }
+        );
       }
-    );
+    });
   }
 });
 
@@ -139,9 +145,6 @@ app.delete("/tasks/:taskId", (req, res) => {
   let writePath = path.join(__dirname, "..", "tasks.json");
   let tasks = [...tasksData.allTasks];
 
-  // Get the tasks data from the JSON file.
-  // const tasksData = JSON.parse(fs.readFileSync(writePath, "utf8"));
-
   // Find the task to be deleted.
   const taskIndex = tasks.findIndex((task) => task.id == taskId);
   console.log(taskIndex);
@@ -152,7 +155,7 @@ app.delete("/tasks/:taskId", (req, res) => {
     let tasksModifiedData = JSON.parse(JSON.stringify(tasks));
 
     // Remove the task from the array
-    tasksModifiedData.allTasks.splice(taskIndex, 1);
+    tasksModifiedData.splice(taskIndex, 1);
     tasksModifiedData;
 
     // Write the modified data back to the file
