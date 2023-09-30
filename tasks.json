@@ -1,26 +1,8 @@
 {
   "allTasks": [
     {
-      "id": 1,
-      "title": "Haircut",
-      "description": "Get a haircut today",
-      "flag": true
-    },
-    {
-      "id": 2,
-      "title": "Set your FPL team",
-      "description": "Make your transfers soon and save changes for the upcoming GW",
-      "flag": false
-    },
-    {
       "id": "0b0ce175-5e3b-4ad3-8742-feb65975aa99",
-      "title": "Finish Upto Post Request",
-      "description": "Complete the assignment until the post request",
-      "flag": true
-    },
-    {
-      "id": "1f6e666f-9e80-4424-a500-b7037af3b292",
-      "title": "eeeeeeeeee",
+      "title": "Set FPL team",
       "description": "fffasdfsdfasdf",
       "flag": true
     }
